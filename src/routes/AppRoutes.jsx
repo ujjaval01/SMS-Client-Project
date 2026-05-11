@@ -21,9 +21,9 @@ function RouteFallback() {
 
 export function AppRoutes() {
   const session = useAppStore((s) => s.session)
-
+  const role = session?.role?.toLowerCase();
   const portalHome =
-    session?.role === 'teacher' ? '/teacher/dashboard' : session?.role === 'admin' ? '/admin/dashboard' : '/student/dashboard'
+    role === 'teacher' ? '/teacher/dashboard' : role === 'admin' ? '/admin/dashboard' : '/student/dashboard'
 
   return (
     <Routes>
@@ -35,7 +35,7 @@ export function AppRoutes() {
       <Route
         path="/student/*"
         element={
-          <ProtectedRoute roles={['student']}>
+          <ProtectedRoute roles={['student', 'STUDENT']}>
             <StudentPortal />
           </ProtectedRoute>
         }
@@ -43,7 +43,7 @@ export function AppRoutes() {
       <Route
         path="/teacher/*"
         element={
-          <ProtectedRoute roles={['teacher']}>
+          <ProtectedRoute roles={['teacher', 'TEACHER']}>
             <TeacherPortal />
           </ProtectedRoute>
         }
@@ -51,11 +51,12 @@ export function AppRoutes() {
       <Route
         path="/admin/*"
         element={
-          <ProtectedRoute roles={['admin']}>
+          <ProtectedRoute roles={['admin', 'ADMIN']}>
             <AdminPortal />
           </ProtectedRoute>
         }
       />
+
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )

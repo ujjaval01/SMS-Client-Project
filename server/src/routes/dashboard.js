@@ -13,23 +13,25 @@ router.get('/summary', async (req, res) => {
       announcements,
       activityLogs,
       assignments,
-      schedule,
+      timetable,
       notes,
       fees,
       users,
-      marks
+      results
+
     ] = await Promise.all([
-      prisma.student.findMany({ include: { marks: true, fees: true } }),
-      prisma.teacher.findMany(),
-      prisma.class.findMany(),
+      prisma.student.findMany({ include: { results: true, fees: true } }),
+      prisma.teacher.findMany({ include: { user: true } }),
+      prisma.class.findMany({ include: { _count: { select: { students: true } } } }),
       prisma.announcement.findMany({ orderBy: { createdAt: 'desc' } }),
       prisma.activityLog.findMany({ orderBy: { createdAt: 'desc' } }),
       prisma.assignment.findMany({ orderBy: { dueDate: 'asc' } }),
-      prisma.schedule.findMany(),
-      prisma.note.findMany(),
+      prisma.timetable.findMany(),
+      [], // notes (placeholder until Note model added if needed)
       prisma.fee.findMany({ include: { student: true } }),
       prisma.user.findMany({ select: { id: true, name: true, email: true, role: true, createdAt: true } }),
-      prisma.mark.findMany()
+      prisma.result.findMany()
+
     ]);
 
     res.json({
@@ -40,11 +42,13 @@ router.get('/summary', async (req, res) => {
       announcements,
       activityLogs,
       assignments,
-      schedule,
+      schedule: timetable,
       notes,
       fees,
       users,
-      marks,
+      results,
+      marks: results,
+
       analytics: {
         monthlyAttendance: [
           { month: 'Jan', pct: 88 },

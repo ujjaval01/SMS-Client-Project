@@ -27,8 +27,10 @@ model Student {
   class       Class?   @relation(fields: [classId], references: [id])
   section     String?
   contact     String?
-  attendance  Attendance[]
-  submissions Submission[]
+  attendancePct Int      @default(0)
+  attendance    Attendance[]
+  submissions   Submission[]
+
   results     Result[]
   fees        Fee[]
   createdAt   DateTime @default(now())

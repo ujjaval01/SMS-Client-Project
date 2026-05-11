@@ -18,7 +18,7 @@ export function TeacherPortal() {
   const theme = useAppStore((s) => s.theme)
   const setTheme = useAppStore((s) => s.setTheme)
   const logout = useAppStore((s) => s.logout)
-  const updateDb = useAppStore((s) => s.updateDb)
+  const toast = useAppStore((s) => s.toast)
 
   return (
     <ShellLayout
@@ -33,14 +33,15 @@ export function TeacherPortal() {
     >
       <Routes>
         <Route path="dashboard" element={<TeacherDashboard db={db} />} />
-        <Route path="students" element={<TeacherStudents db={db} updateDb={updateDb} />} />
-        <Route path="attendance" element={<TeacherAttendance updateDb={updateDb} />} />
-        <Route path="results" element={<TeacherResults db={db} updateDb={updateDb} />} />
-        <Route path="assignments" element={<TeacherAssignments db={db} updateDb={updateDb} />} />
-        <Route path="timetable" element={<TeacherTimetable db={db} updateDb={updateDb} />} />
-        <Route path="announcements" element={<TeacherAnnouncements db={db} updateDb={updateDb} />} />
+        <Route path="students" element={<TeacherStudents db={db} toast={toast} />} />
+        <Route path="attendance" element={<TeacherAttendance db={db} toast={toast} />} />
+        <Route path="results" element={<TeacherResults db={db} toast={toast} />} />
+        <Route path="assignments" element={<TeacherAssignments db={db} toast={toast} />} />
+        <Route path="timetable" element={<TeacherTimetable db={db} toast={toast} />} />
+        <Route path="announcements" element={<TeacherAnnouncements db={db} toast={toast} />} />
         <Route path="analytics" element={<TeacherAnalytics db={db} />} />
         <Route path="settings" element={<TeacherSettings />} />
+
         <Route path="*" element={<Navigate to="/teacher/dashboard" replace />} />
       </Routes>
     </ShellLayout>

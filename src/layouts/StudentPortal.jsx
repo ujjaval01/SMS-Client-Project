@@ -20,8 +20,12 @@ export function StudentPortal() {
   const setTheme = useAppStore((s) => s.setTheme)
   const logout = useAppStore((s) => s.logout)
 
-  const me = db.students.find((s) => s.id === session?.studentId) || db.students[0]
-  const myMarks = db.marks.find((m) => m.studentId === me.id) || db.marks[0]
+  const me = db.students.find((s) => s.id === session?.studentId) || db.students[0] || {}
+  const myResults = db.results?.filter((r) => r.studentId === me.id) || []
+  const myMarks = myResults[0] || {}
+
+
+  const toast = useAppStore((s) => s.toast)
 
   return (
     <ShellLayout
@@ -35,15 +39,16 @@ export function StudentPortal() {
       className="student-shell"
     >
       <Routes>
-        <Route path="dashboard" element={<StudentDashboard me={me} myMarks={myMarks} db={db} />} />
-        <Route path="attendance" element={<StudentAttendance me={me} />} />
-        <Route path="results" element={<StudentResults myMarks={myMarks} />} />
-        <Route path="assignments" element={<StudentAssignments assignments={db.assignments} />} />
+        <Route path="dashboard" element={<StudentDashboard me={me} myResults={myResults} db={db} />} />
+        <Route path="attendance" element={<StudentAttendance me={me} db={db} />} />
+        <Route path="results" element={<StudentResults myResults={myResults} />} />
+        <Route path="assignments" element={<StudentAssignments assignments={db.assignments} toast={toast} />} />
         <Route path="timetable" element={<StudentTimetable schedule={db.schedule} />} />
-        <Route path="notes" element={<StudentNotes notes={db.notes} />} />
-        <Route path="fees" element={<StudentFees studentId={me.id} db={db} />} />
+        <Route path="notes" element={<StudentNotes />} />
+        <Route path="fees" element={<StudentFees studentId={me.id} db={db} toast={toast} />} />
         <Route path="notifications" element={<StudentNotifications announcements={db.announcements} />} />
-        <Route path="profile" element={<StudentProfile session={session} me={me} />} />
+        <Route path="profile" element={<StudentProfile session={session} me={me} toast={toast} />} />
+
         <Route path="*" element={<Navigate to="/student/dashboard" replace />} />
       </Routes>
       <Chatbot />

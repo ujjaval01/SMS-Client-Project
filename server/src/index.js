@@ -5,9 +5,18 @@ import authRoutes from './routes/auth.js';
 import studentRoutes from './routes/students.js';
 import teacherRoutes from './routes/teachers.js';
 import dashboardRoutes from './routes/dashboard.js';
+import classRoutes from './routes/classes.js';
+import resultRoutes from './routes/results.js';
+import announcementRoutes from './routes/announcements.js';
+import attendanceRoutes from './routes/attendance.js';
+import feeRoutes from './routes/fees.js';
+
+
+
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import { PrismaClient } from '@prisma/client';
+import { initSocket } from './utils/socket.js';
 
 dotenv.config();
 
@@ -15,10 +24,13 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: "*", // Adjust for production
+    origin: "*",
     methods: ["GET", "POST"]
   }
 });
+
+initSocket(io);
+
 
 const PORT = process.env.PORT || 5000;
 const prisma = new PrismaClient();
@@ -54,6 +66,14 @@ app.use('/api/auth', authRoutes);
 app.use('/api/students', studentRoutes);
 app.use('/api/teachers', teacherRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/classes', classRoutes);
+app.use('/api/results', resultRoutes);
+app.use('/api/announcements', announcementRoutes);
+app.use('/api/attendance', attendanceRoutes);
+app.use('/api/fees', feeRoutes);
+
+
+
 
 app.get('/', (req, res) => {
   res.send('SMS Real-time API is running...');

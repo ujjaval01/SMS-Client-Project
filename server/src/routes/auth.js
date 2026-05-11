@@ -12,17 +12,22 @@ router.post('/login', async (req, res) => {
   console.log(`Login attempt for: ${email}`);
 
   try {
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await prisma.user.findUnique({ 
+      where: { email },
+      include: { student: true, teacher: true }
+    });
+
     if (!user) return res.status(404).json({ message: 'User not found' });
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
 
     const token = jwt.sign(
-      { id: user.id, role: user.role, email: user.email },
+      { id: user.id, role: user.role, email: user.email, name: user.name },
       process.env.JWT_SECRET,
       { expiresIn: '1d' }
     );
+
 
     res.json({
       token,
@@ -31,9 +36,10 @@ router.post('/login', async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
-        studentId: user.studentId,
-        teacherId: user.teacherId
+        studentId: user.student?.id,
+        teacherId: user.teacher?.id
       }
+
     });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
