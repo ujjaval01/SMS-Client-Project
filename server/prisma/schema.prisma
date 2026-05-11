@@ -1,0 +1,183 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      String   // ADMIN, TEACHER, STUDENT
+  student   Student?
+  teacher   Teacher?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Student {
+  id          String   @id // Student ID like VNIT-2024-1001
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  classId     String?
+  class       Class?   @relation(fields: [classId], references: [id])
+  section     String?
+  contact     String?
+  attendance  Attendance[]
+  submissions Submission[]
+  results     Result[]
+  fees        Fee[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Teacher {
+  id          String   @id
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject     String?
+  department  String?
+  classes     Class[]  // Classes they are class teachers of
+  assignments Assignment[]
+  timetables  Timetable[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Class {
+  id            String   @id @default(uuid())
+  name          String   // e.g. B.Tech CSE
+  year          String   // e.g. 2nd Year
+  section       String?
+  teacherId     String?
+  classTeacher  Teacher? @relation(fields: [teacherId], references: [id])
+  students      Student[]
+  subjects      Subject[]
+  timetables    Timetable[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Subject {
+  id          String   @id @default(uuid())
+  name        String
+  code        String   @unique
+  classId     String
+  class       Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
+  assignments Assignment[]
+  results     Result[]
+}
+
+model Attendance {
+  id        String   @id @default(uuid())
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  date      DateTime
+  status    String   // Present, Absent, Late
+  markedBy  String?
+  createdAt DateTime @default(now())
+}
+
+model Assignment {
+  id          String       @id @default(uuid())
+  title       String
+  description String?
+  dueDate     DateTime
+  subjectId   String
+  subject     Subject      @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  teacherId   String
+  teacher     Teacher      @relation(fields: [teacherId], references: [id])
+  fileUrl     String?
+  submissions Submission[]
+  createdAt   DateTime     @default(now())
+}
+
+model Submission {
+  id           String     @id @default(uuid())
+  assignmentId String
+  assignment   Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  studentId    String
+  student      Student    @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  fileUrl      String
+  status       String     // Submitted, Graded
+  grade        String?
+  feedback     String?
+  createdAt    DateTime   @default(now())
+}
+
+model Result {
+  id        String   @id @default(uuid())
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  subjectId String
+  subject   Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  marks     Int
+  total     Int
+  grade     String?
+  term      String?
+  createdAt DateTime @default(now())
+}
+
+model Timetable {
+  id        String   @id @default(uuid())
+  classId   String
+  class     Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
+  teacherId String
+  teacher   Teacher  @relation(fields: [teacherId], references: [id])
+  day       String   // Monday, Tuesday...
+  startTime String
+  endTime   String
+  subject   String
+}
+
+model Announcement {
+  id          String   @id @default(uuid())
+  title       String
+  content     String
+  priority    String   @default("Normal") // High, Normal, Low
+  scheduledFor DateTime?
+  attachments String?  // JSON string or URL
+  createdBy   String
+  createdAt   DateTime @default(now())
+}
+
+model Fee {
+  id                 String   @id @default(uuid())
+  studentId          String
+  student            Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  term               String
+  amount             Int
+  paid               Int
+  status             String   @default("Pending") // Paid, Partial, Pending
+  verificationStatus String   @default("None")    // Verified, Pending, None
+  createdAt          DateTime @default(now())
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  type      String?  // Assignment, Result, Fee...
+  createdAt DateTime @default(now())
+}
+
+model ActivityLog {
+  id        String   @id @default(uuid())
+  action    String
+  actor     String
+  role      String
+  details   String?
+  createdAt DateTime @default(now())
+}
+
+model Setting {
+  id    String @id @default("system")
+  key   String @unique
+  value String
+}
