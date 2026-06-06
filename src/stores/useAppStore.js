@@ -4,17 +4,22 @@ import { io } from 'socket.io-client'
 
 const SESSION = 'sms-auth-session'
 const TOKEN = 'sms-auth-token'
-const SOCKET_URL = 'http://localhost:5000'
+const SOCKET_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
 
 export const useAppStore = create((set, get) => ({
   socket: null,
   db: {
-
     students: [],
     teachers: [],
     fees: [],
+    assignments: [], 
+    schedule: [],
+    notes: [],
     announcements: [],
     activityLogs: [],
+    classes: [],
+    users: [],
+    marks: [],
     summary: {}
   },
   session: JSON.parse(typeof localStorage !== 'undefined' ? localStorage.getItem(SESSION) || 'null' : 'null'),
