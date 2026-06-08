@@ -99,7 +99,7 @@ export function AuthPage() {
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 shadow-inner backdrop-blur-md">
             <Users size={20} className="text-white" />
           </div>
-          <span className="text-xl font-bold tracking-wider text-white">Readify</span>
+          <span className="text-xl font-bold tracking-wider text-white">EduSync</span>
         </div>
 
         <motion.div 
@@ -118,7 +118,7 @@ export function AuthPage() {
         </motion.div>
 
         <div className="relative z-10 text-sm text-white/50">
-          &copy; {new Date().getFullYear()} Readify Education System
+          &copy; {new Date().getFullYear()} EduSync Education System
         </div>
       </div>
 

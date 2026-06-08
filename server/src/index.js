@@ -90,7 +90,7 @@ app.use('/api/assignments', assignmentRoutes);
 
 
 app.get('/', (req, res) => {
-  res.send('SMS Real-time API is running...');
+  res.send('EduSync API is running...');
 });
 
 if (!process.env.VERCEL) {

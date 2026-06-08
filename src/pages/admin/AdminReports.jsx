@@ -51,7 +51,7 @@ export function AdminReports({ db, toast }) {
     const wsFees = XLSX.utils.json_to_sheet(feeData)
     XLSX.utils.book_append_sheet(wb, wsFees, "Fees")
 
-    XLSX.writeFile(wb, "SMS_Full_Report.xlsx")
+    XLSX.writeFile(wb, "EduSync_Full_Report.xlsx")
     toast('Excel Workbook Downloaded', 'default')
   }
 
