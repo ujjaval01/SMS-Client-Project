@@ -3,7 +3,6 @@ import { PrismaClient } from '@prisma/client';
 import { protect, authorize } from '../middleware/auth.js';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
-import { emitEvent } from '../utils/socket.js';
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -82,8 +81,6 @@ router.post('/', protect, authorize('ADMIN'), async (req, res) => {
     });
 
     // 3. Emit real-time event
-    emitEvent('student_created', result);
-    emitEvent('stats_updated', { type: 'student_count_increment' });
 
     res.status(201).json(result);
   } catch (error) {

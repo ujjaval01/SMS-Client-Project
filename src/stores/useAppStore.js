@@ -1,13 +1,9 @@
 import { create } from 'zustand'
 import { api } from '../services/api'
-import { io } from 'socket.io-client'
-
 const SESSION = 'sms-auth-session'
 const TOKEN = 'sms-auth-token'
-const SOCKET_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
 
 export const useAppStore = create((set, get) => ({
-  socket: null,
   db: {
     students: [],
     teachers: [],
@@ -73,7 +69,6 @@ export const useAppStore = create((set, get) => ({
       localStorage.setItem(TOKEN, data.token);
       localStorage.setItem(SESSION, JSON.stringify(data.user));
       set({ session: data.user });
-      get().initSocket();
       await get().fetchInitialData();
       return true;
     } catch (error) {
@@ -121,41 +116,10 @@ export const useAppStore = create((set, get) => ({
     const raw = localStorage.getItem(SESSION)
     if (raw) {
       set({ session: JSON.parse(raw) });
-      get().initSocket();
       get().fetchInitialData();
     }
   },
 
-  initSocket: () => {
-    if (get().socket) return;
-    
-    const socket = io(SOCKET_URL);
-    
-    socket.on('announcement_created', (announcement) => {
-      set((state) => ({
-        db: {
-          ...state.db,
-          announcements: [announcement, ...state.db.announcements]
-        }
-      }));
-      get().toast(`New Announcement: ${announcement.title}`);
-    });
-
-    socket.on('stats_updated', () => {
-      get().fetchInitialData(); // Refetch stats when they change
-    });
-
-    socket.on('activity_created', (log) => {
-      set((state) => ({
-        db: {
-          ...state.db,
-          activityLogs: [log, ...state.db.activityLogs]
-        }
-      }));
-    });
-
-    set({ socket });
-  },
 }))
 
 

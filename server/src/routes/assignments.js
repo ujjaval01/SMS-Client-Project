@@ -1,7 +1,6 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import { protect, authorize } from '../middleware/auth.js';
-import { emitEvent } from '../utils/socket.js';
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -42,7 +41,6 @@ router.post('/', protect, authorize('ADMIN', 'TEACHER'), async (req, res) => {
 
     console.log('Assignment created successfully:', assignment.id);
 
-    emitEvent('assignment_created', assignment);
     
     // Create activity log
     await prisma.activityLog.create({

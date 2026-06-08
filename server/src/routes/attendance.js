@@ -1,7 +1,6 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import { protect, authorize } from '../middleware/auth.js';
-import { emitEvent } from '../utils/socket.js';
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -47,7 +46,6 @@ router.post('/mark', protect, authorize('TEACHER', 'ADMIN'), async (req, res) =>
 
     console.log('Attendance marked successfully');
 
-    emitEvent('attendance_updated', { studentId, status });
     res.status(201).json(record);
   } catch (error) {
     console.error('Attendance Mark Error:', error);

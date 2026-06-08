@@ -15,39 +15,16 @@ import assignmentRoutes from './routes/assignments.js';
 
 
 
-import { createServer } from 'http';
-import { Server } from 'socket.io';
 import { PrismaClient } from '@prisma/client';
-import { initSocket } from './utils/socket.js';
 
 dotenv.config();
 
 const app = express();
-const httpServer = createServer(app);
-const io = new Server(httpServer, {
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST"]
-  }
-});
-
-initSocket(io);
-
 
 const PORT = process.env.PORT || 5000;
 const prisma = new PrismaClient();
 
-// Socket.IO Connection
-io.on('connection', (socket) => {
-  console.log('User connected:', socket.id);
-  
-  socket.on('disconnect', () => {
-    console.log('User disconnected:', socket.id);
-  });
-});
 
-// Make io accessible in routes
-app.set('io', io);
 
 // Check DB Connection
 async function checkDb() {
@@ -83,7 +60,11 @@ app.get('/', (req, res) => {
   res.send('SMS Real-time API is running...');
 });
 
-httpServer.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+}
+
+export default app;
 

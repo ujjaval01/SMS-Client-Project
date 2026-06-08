@@ -1,7 +1,6 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import { protect, authorize } from '../middleware/auth.js';
-import { emitEvent } from '../utils/socket.js';
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -23,7 +22,6 @@ router.post('/publish', protect, authorize('TEACHER', 'ADMIN'), async (req, res)
     });
 
     // Real-time broadcast to specific student
-    emitEvent('result_published', { studentId, result });
     
     await prisma.activityLog.create({
       data: {
