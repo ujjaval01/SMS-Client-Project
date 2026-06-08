@@ -31,6 +31,39 @@ async function checkDb() {
   try {
     const count = await prisma.user.count();
     console.log(`Connected to DB. Total users in database: ${count}`);
+
+    // Ensure static admin exists
+    const adminEmail = 'admin@ujvl.com';
+    const adminExists = await prisma.user.findUnique({ where: { email: adminEmail } });
+    if (!adminExists) {
+      const bcrypt = await import('bcryptjs');
+      const hash = await bcrypt.hash('ujvl123', 10);
+      await prisma.user.create({
+        data: {
+          email: adminEmail,
+          password: hash,
+          name: 'System Admin',
+          role: 'admin'
+        }
+      });
+      console.log('Static admin created.');
+    }
+
+    // Ensure classes 1 to 12 exist for registration
+    for (let i = 1; i <= 12; i++) {
+      const classId = i.toString();
+      const existingClass = await prisma.class.findUnique({ where: { id: classId } });
+      if (!existingClass) {
+        await prisma.class.create({
+          data: {
+            id: classId,
+            name: `Class ${i}`,
+            year: new Date().getFullYear().toString()
+          }
+        });
+      }
+    }
+
   } catch (err) {
     console.error('Database connection failed:', err.message);
   }

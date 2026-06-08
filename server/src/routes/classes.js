@@ -5,6 +5,18 @@ import { protect, authorize } from '../middleware/auth.js';
 const router = express.Router();
 const prisma = new PrismaClient();
 
+// Get basic classes list for public registration
+router.get('/public', async (req, res) => {
+  try {
+    const classes = await prisma.class.findMany({
+      select: { id: true, name: true, section: true }
+    });
+    res.json(classes);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
 // Get all classes
 router.get('/', protect, async (req, res) => {
   try {

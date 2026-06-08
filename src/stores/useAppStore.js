@@ -62,6 +62,15 @@ export const useAppStore = create((set, get) => ({
     }
   },
 
+  fetchClassesPublic: async () => {
+    try {
+      const classes = await api.get('/classes/public');
+      return classes;
+    } catch (error) {
+      console.error("Failed to fetch public classes", error);
+      return [];
+    }
+  },
 
   login: async (email, password, role) => {
     try {
@@ -81,8 +90,10 @@ export const useAppStore = create((set, get) => ({
     try {
       await api.post('/auth/register', payload);
       get().toast('Account created successfully');
+      return true;
     } catch (error) {
-      get().toast('Registration failed', 'error');
+      get().toast('Registration failed: ' + error.message, 'error');
+      return false;
     }
   },
 

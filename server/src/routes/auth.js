@@ -48,19 +48,25 @@ router.post('/login', async (req, res) => {
 
 // Register (for demo/admin purposes)
 router.post('/register', async (req, res) => {
-  const { email, password, name, role, studentId, teacherId } = req.body;
+  const { email, password, name, role, studentId, teacherId, classId, section } = req.body;
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
+    const userData = {
+      email,
+      password: hashedPassword,
+      name,
+      role
+    };
+
+    if (role === 'student' && studentId) {
+      userData.student = { create: { id: studentId, classId, section } };
+    } else if (role === 'teacher' && teacherId) {
+      userData.teacher = { create: { id: teacherId } };
+    }
+
     const user = await prisma.user.create({
-      data: {
-        email,
-        password: hashedPassword,
-        name,
-        role,
-        studentId,
-        teacherId
-      }
+      data: userData
     });
 
     res.status(201).json({ message: 'User created', userId: user.id });
